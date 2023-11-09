@@ -36,20 +36,14 @@ module.exports = {
 
     const [hours, minutes] = startTime.split(':').map(Number);
 
+    // Define next execution time
+    let nextExecutionTime = new Date();
+    nextExecutionTime.setHours(hours, minutes, 0, 0); // Set seconds and milliseconds to 0?
+    if (nextExecutionTime < new Date()) {
+      nextExecutionTime.setDate(nextExecutionTime.getDate() + 1);
+    }
 
-let nextExecutionTime = new Date();
-nextExecutionTime.setHours(hours, minutes);
-if (nextExecutionTime < new Date()) {
-  nextExecutionTime.setDate(nextExecutionTime.getDate() + 1);
-}
-
-const isExecutionTime = () => {
-  const now = new Date();
-  return now >= nextExecutionTime;
-};
-    
-const jobId = `job-${Date.now()}`;
-
+    const jobId = `job-${Date.now()}`;
 
     let task = cron.schedule(`0 ${minutes} ${hours} * * *`, async () => {
       try {
@@ -59,7 +53,7 @@ const jobId = `job-${Date.now()}`;
 
         // Update next execution time
         nextExecutionTime = new Date(nextExecutionTime.getTime() + (intervalHours * 60 * 60 * 1000));
-        updateNextExecutionTime(channelId, intervalHours, jobId);
+        updateNextExecutionTime(jobId, nextExecutionTime);
       } catch (error) {
         console.error('Failed to send scheduled message:', error);
       }
@@ -67,14 +61,15 @@ const jobId = `job-${Date.now()}`;
       scheduled: true
     });
 
+
     task.start();
     interaction.client.cronJobs.set(jobId, task);
+
     saveSchedule({ jobId, messageText, channelId, startTime, intervalHours, nextExecutionTime: nextExecutionTime.toISOString() });
 
     interaction.reply({ content: `Message scheduled successfully and will repeat every ${intervalHours} hours.`, ephemeral: true });
-    }
-  };
-
+  }
+};
 
 function saveSchedule(scheduleObj) {
   let schedules = [];
@@ -87,31 +82,13 @@ function saveSchedule(scheduleObj) {
   fs.writeFileSync(schedulesFilePath, JSON.stringify(schedules, null, 2), 'utf8');
 }
 
-function updateNextExecutionTime(channelId, intervalHours) {
-  const schedules = JSON.parse(fs.readFileSync(schedulesFilePath, 'utf8'));
 
-  schedules.forEach(schedule => {
-    if (schedule.channelId === channelId) {
-      const lastExecutionTime = new Date(schedule.nextExecutionTime);
-      const nextExecutionTime = new Date(lastExecutionTime.getTime() + intervalHours * 60 * 60 * 1000);
-      schedule.nextExecutionTime = nextExecutionTime.toISOString();
-    }
-  });
+function updateNextExecutionTime(jobId, nextExecutionTime) {
+  let schedules = JSON.parse(fs.readFileSync(schedulesFilePath, 'utf8'));
+  const scheduleIndex = schedules.findIndex(schedule => schedule.jobId === jobId);
 
-  fs.writeFileSync(schedulesFilePath, JSON.stringify(schedules, null, 2), 'utf8');
+  if (scheduleIndex !== -1) {
+    schedules[scheduleIndex].nextExecutionTime = nextExecutionTime.toISOString();
+    fs.writeFileSync(schedulesFilePath, JSON.stringify(schedules, null, 2), 'utf8');
+  }
 }
-
-function updateNextExecutionTime(channelId, intervalHours, jobId) {
-  const schedules = JSON.parse(fs.readFileSync(schedulesFilePath, 'utf8'));
-
-  schedules.forEach(schedule => {
-    if (schedule.channelId === channelId && schedule.jobId === jobId) {
-      const lastExecutionTime = new Date(schedule.nextExecutionTime);
-      const nextExecutionTime = new Date(lastExecutionTime.getTime() + intervalHours * 60 * 60 * 1000);
-      schedule.nextExecutionTime = nextExecutionTime.toISOString();
-    }
-  });
-
-  fs.writeFileSync(schedulesFilePath, JSON.stringify(schedules, null, 2), 'utf8');
-}
-

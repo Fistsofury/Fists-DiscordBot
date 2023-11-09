@@ -20,6 +20,7 @@ This is a discord bot that displays the amount of players in your server as the 
 - /maintenence Displays a custome maintenance message for when your server needs to be taken down or CFX is down
  <img src="https://i.imgur.com/n5oAyk2.png"> 
 - /clearmaintenance: Deletes the maintenance message
+
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:

@@ -26,18 +26,18 @@ module.exports = {
       await interaction.reply({ content: 'This command can only be used in text channels within a server.', ephemeral: true });
       return;
     }
+
     if (!channel.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.SendMessages)) {
       await interaction.reply({ content: 'I do not have permission to send messages in the chosen channel.', ephemeral: true });
       return;
     }
 
-    // Create the embed
+
     const embed = new EmbedBuilder()
       .setColor(0xFF0000)
       .setTitle('Maintenance Alert')
       .setDescription(messageText)
       .setTimestamp();
-
     let sentMessage;
     try {
       sentMessage = await channel.send({ embeds: [embed] });

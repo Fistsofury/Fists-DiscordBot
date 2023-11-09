@@ -16,7 +16,6 @@ module.exports = {
     }
 
     const { maintenanceMessageId, maintenanceChannelId } = maintenanceData;
-
     if (!maintenanceMessageId || !maintenanceChannelId) {
       await interaction.reply({ content: 'No maintenance message found to clear.', ephemeral: true });
       return;
@@ -24,7 +23,9 @@ module.exports = {
 
     const channel = await interaction.client.channels.fetch(maintenanceChannelId);
     const message = await channel.messages.fetch(maintenanceMessageId);
+    
     await message.delete();
+    
     fs.writeFileSync('./maintenance.json', JSON.stringify({}, null, 2), 'utf8');
     await interaction.reply({ content: 'Maintenance message cleared.', ephemeral: true });
   },

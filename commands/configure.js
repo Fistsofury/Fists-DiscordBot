@@ -21,6 +21,7 @@ module.exports = {
     const url = `http://${ip}:${port}/players.json`;
 
     try {
+      // Attempt to fetch player data from the server
       const response = await axios.get(url);
       const playerCount = response.data.length;
 
@@ -38,6 +39,8 @@ module.exports = {
       config.serverPort = port;
 
       fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf8');
+
+      // Confirm that the IP and port have been updated in the config.json
       await interaction.followUp(`Server IP and port have been updated to ${ip}:${port}.`);
 
     } catch (error) {

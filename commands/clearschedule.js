@@ -23,7 +23,6 @@ module.exports = {
           const numberToDelete = interaction.fields.getTextInputValue('scheduleNumberInput');
           const indexToDelete = parseInt(numberToDelete) - 1;
           let schedules = JSON.parse(fs.readFileSync(schedulesFilePath, 'utf8'));
-
           if (isNaN(indexToDelete) || indexToDelete < 0 || indexToDelete >= schedules.length) {
             await interaction.reply({ content: 'Invalid schedule number.', ephemeral: true });
             return;
@@ -59,6 +58,7 @@ module.exports = {
     });
     message += 'Click the button corresponding to the schedule you wish to delete.';
 
+    // Prepare buttons for user 
     const row = new ActionRowBuilder()
       .addComponents(
         new ButtonBuilder()
@@ -71,8 +71,10 @@ module.exports = {
           .setStyle(ButtonStyle.Danger),
       );
 
+    // button part
     await interaction.reply({ content: message, components: [row], ephemeral: true });
 
+    // Pick a button after wait
     const filter = i => ['delete_one', 'delete_all'].includes(i.customId) && i.user.id === interaction.user.id;
     const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000, max: 1 });
 
@@ -92,6 +94,7 @@ module.exports = {
         const firstActionRow = new ActionRowBuilder().addComponents(numberInput);
 
         modal.addComponents(firstActionRow);
+
 
         await i.showModal(modal);
       } else if (i.customId === 'delete_all') {

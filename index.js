@@ -80,16 +80,19 @@ setInterval(async () => {
 
   const channel = await client.channels.fetch(client.statusChannelId);
   const statusMessage = await channel.messages.fetch(client.statusMessageId);
-  //code to be added
+
+
   const { playerData, serverStatus } = await fetchPlayerDataAndServerStatus();
+
+
 const embed = new EmbedBuilder()
   .setColor(serverStatus.online ? 0x00FF00 : 0xFF0000) // Green if online, red if not
   .setTitle(`Server is ${serverStatus.online ? 'online' : 'offline'}`)
   .setTimestamp();
-
 playerData.forEach(player => {
   embed.addFields({ name: player.name, value: `Ping: ${player.ping}`, inline: true });
 });
+
 
 if (playerData.length === 0) {
   embed.addFields({ name: 'No players online', value: '\u200B', inline: false });
@@ -116,6 +119,7 @@ async function fetchPlayerDataAndServerStatus() {
       };
     }
 
+    // Format player data into a table
     let playerData = players.map(player => ({
       name: player.name,
       ping: player.ping
