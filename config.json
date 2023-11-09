@@ -3,5 +3,6 @@
   "clientId": "your-client-id-here",
   "guildId": "your-guild-id-here",
   "serverIp": "your-server-ip-here",
-  "serverPort": "your-server-port-here"
+  "serverPort": "your-server-port-here",
+  "allowedRoles": ["your-reole-id-here"]
 }
