@@ -21,6 +21,14 @@ This is a discord bot that displays the amount of players in your server as the 
  <img src="https://i.imgur.com/n5oAyk2.png"> 
 - /clearmaintenance: Deletes the maintenance message
 
+## Config.JSON
+-   "token": "your-bot-token-here", -- Put in your bot token
+-  "clientId": "your-client-id-here", -- put in your bots application ID
+-  "guildId": "your-guild-id-here", -- Put in your server ID
+-  "serverIp": "your-server-ip-here", -- Can leave blank and use /configure to overwrite
+-  "serverPort": "your-server-port-here", -- Can leave blank and use /configure to overwrite
+-  "allowedRoles": ["your-reole-id-here"] --User permission ID's for people to use the commands ["ROLE_ID_1", "ROLE_ID_2", "ROLE_ID_3"]
+
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:

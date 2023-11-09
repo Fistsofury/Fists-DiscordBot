@@ -4,5 +4,5 @@
   "guildId": "your-guild-id-here",
   "serverIp": "your-server-ip-here",
   "serverPort": "your-server-port-here",
-  "allowedRoles": ["your-reole-id-here"]
+  "allowedRoles": ["ROLE_ID_1", "ROLE_ID_2", "ROLE_ID_3"]
 }
