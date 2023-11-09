@@ -58,3 +58,7 @@ npm install discord.js
 npm install @discordjs/rest discord-api-types
 npm install axios
 npm install fs-extra
+```
+
+### Special Mentions
+Thanks to Jake2k4, SavSin and Bytesizd
