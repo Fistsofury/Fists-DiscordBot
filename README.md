@@ -10,15 +10,15 @@ This is a discord bot that displays the amount of players in your server as the 
 - Sets bots status as your player count
 
 ## Features
-- <img src="https://i.imgur.com/wyCAkDS.png"> 
+ <img src="https://i.imgur.com/wyCAkDS.png"> 
 - /configure : will alow you to configure the IP and the port of the server, it will overwrite the config.json and will aslso set the bots status
 - /channel: Pick the channel of wehre you want the player list to be displayed and updated every minute. (it doesnt ping)
-- <img src="https://i.imgur.com/PzWuE7C.png"> 
+ <img src="https://i.imgur.com/PzWuE7C.png"> 
 - /schedule: Schedules a message to a channel of your chosing to repeat every X amount of hours, great for server restarts and general repatitive messaging in your discord server.
-- <img src="https://i.imgur.com/UN3AYJP.png"> 
+ <img src="https://i.imgur.com/UN3AYJP.png"> 
 - /clearschedule: - Delete all or delete a specefic schedule
 - /maintenence Displays a custome maintenance message for when your server needs to be taken down or CFX is down
-- <img src="https://i.imgur.com/n5oAyk2.png"> 
+ <img src="https://i.imgur.com/n5oAyk2.png"> 
 - /clearmaintenance: Deletes the maintenance message
 ## Prerequisites
 
