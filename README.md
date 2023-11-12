@@ -68,7 +68,7 @@ npm install axios
 npm install fs-extra
 ```
 
-# You will need to run the registerCommands.js before you run the bot.
+### You will need to run the registerCommands.js before you run the bot.
 ```node ./utils/registerCommands.js```
 
 ### Special Mentions
