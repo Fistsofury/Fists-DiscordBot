@@ -1,6 +1,8 @@
 const fs = require('fs');
-const { Client, Collection, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const axios = require('axios');
+const { Client, Collection, GatewayIntentBits, EmbedBuilder, ActivityType, } = require('discord.js');
 const { token, serverIp, serverPort } = require('./config.json');
+
 
 
 const client = new Client({
@@ -32,108 +34,82 @@ for (const file of eventFiles) {
 }
 console.log(new Date().toString());
 client.cronJobs = new Map();
+client.on('ready', () => {
+  console.log(`Logged in as ${client.user.tag}!`);
+  client.updateBotStatus();// Initial update on startup
+  setInterval(() => client.updateBotStatus(), 60000); // Update every 1m
+
+});
+
+client.updateBotStatus = async function() {
+  try {
+    const url = `http://${serverIp}:${serverPort}/players.json`;
+    const response = await axios.get(url);
+    const playerCount = response.data.length;
+
+    await this.user.setPresence({
+      activities: [{ name: `${playerCount} players online`, type: ActivityType.Watching }],
+      status: 'online', 
+    });
+
+    console.log(`Status updated: ${playerCount} players online`);
+  } catch (error) {
+    console.error('Failed to update bot status:', error);
+  }
+};
 client.on('interactionCreate', async interaction => {
-  if (!interaction.isModalSubmit()) return;
-  if (interaction.customId === 'deleteScheduleModal') {
-    try {
-      // Logs
-      console.log('Modal interaction received:', interaction);
+  console.log('Interaction received:', interaction.type, interaction.customId);
 
-      const numberToDelete = interaction.fields.getTextInputValue('scheduleNumberInput');
-      const indexToDelete = parseInt(numberToDelete, 10) - 1;
+  // Handle Modal Submissions
+  if (interaction.isModalSubmit()) {
+    if (interaction.customId === 'deleteScheduleModal') {
+      try {
+        console.log('Modal interaction received:', interaction);
+        const numberToDelete = interaction.fields.getTextInputValue('scheduleNumberInput');
+        const indexToDelete = parseInt(numberToDelete, 10) - 1;
+        console.log(`Index to delete: ${indexToDelete}`);
+        let schedules = JSON.parse(fs.readFileSync('./schedules.json', 'utf8'));
+        console.log('Schedules before deletion:', schedules);
 
-      // Logs
-      console.log(`Index to delete: ${indexToDelete}`);
+        if (isNaN(indexToDelete) || indexToDelete < 0 || indexToDelete >= schedules.length) {
+          await interaction.reply({ content: 'Invalid schedule number.', ephemeral: true });
+          return;
+        }
 
-      let schedules = JSON.parse(fs.readFileSync('./schedules.json', 'utf8'));
-
-      // Logs
-      console.log('Schedules before deletion:', schedules);
-
-      if (isNaN(indexToDelete) || indexToDelete < 0 || indexToDelete >= schedules.length) {
-        await interaction.reply({ content: 'Invalid schedule number.', ephemeral: true });
-        return;
+        schedules.splice(indexToDelete, 1);
+        fs.writeFileSync('./schedules.json', JSON.stringify(schedules, null, 2), 'utf8');
+        console.log('Schedules after deletion:', schedules);
+        await interaction.reply({ content: `Schedule number ${numberToDelete} has been deleted.`, ephemeral: true });
+      } catch (error) {
+        console.error('Error processing modal submission:', error);
+        await interaction.reply({ content: `An error occurred while processing your request: ${error.message}`, ephemeral: true });
       }
+    }
+  }
 
-      schedules.splice(indexToDelete, 1);
-      fs.writeFileSync('./schedules.json', JSON.stringify(schedules, null, 2), 'utf8');
+  // Handle Button Interactions
+  if (interaction.isButton()) {
+    console.log('Button interaction:', interaction.customId);
 
-      // Log the schedules after deletion
-      console.log('Schedules after deletion:', schedules);
-
-      await interaction.reply({ content: `Schedule number ${numberToDelete} has been deleted.`, ephemeral: true });
-    } catch (error) {
-      console.error('Error processing modal submission:', error);
-      await interaction.reply({ content: `An error occurred while processing your request: ${error.message}`, ephemeral: true });
+    if (interaction.customId === 'previous' || interaction.customId === 'next') {
+      try {
+        const channelCommand = client.commands.get('channel');
+        if (channelCommand && channelCommand.handlePagination) {
+          await channelCommand.handlePagination(interaction);
+        } else {
+          console.error('Pagination handler not found for channel command');
+          await interaction.reply({ content: 'Unable to process the request.', ephemeral: true });
+        }
+      } catch (error) {
+        console.error('Error handling button interaction:', error);
+        await interaction.reply({ content: 'There was an error while processing your request.', ephemeral: true });
+      }
     }
   }
 });
+
 
 
 client.login(token);
 
-
-const updateInterval = 60000; // 60 seconds
 console.log(`Current time zone is: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
-setInterval(async () => {
-  if (!client.statusMessageId || !client.statusChannelId) return;
-
-  const channel = await client.channels.fetch(client.statusChannelId);
-  const statusMessage = await channel.messages.fetch(client.statusMessageId);
-
-
-  const { playerData, serverStatus } = await fetchPlayerDataAndServerStatus();
-
-
-const embed = new EmbedBuilder()
-  .setColor(serverStatus.online ? 0x00FF00 : 0xFF0000) // Green if online, red if not
-  .setTitle(`Server is ${serverStatus.online ? 'online' : 'offline'}`)
-  .setTimestamp();
-playerData.forEach(player => {
-  embed.addFields({ name: player.name, value: `Ping: ${player.ping}`, inline: true });
-});
-
-
-if (playerData.length === 0) {
-  embed.addFields({ name: 'No players online', value: '\u200B', inline: false });
-}
-
-await statusMessage.edit({ embeds: [embed] });
-}, updateInterval);
-
-
-
-const axios = require('axios');
-
-async function fetchPlayerDataAndServerStatus() {
-  try {
-    const url = `http://${serverIp}:${serverPort}/players.json`;
-
-    const response = await axios.get(url);
-    const players = response.data;
-
-    if (!Array.isArray(players) || players.length === 0) {
-      return {
-        playerData: [],
-        serverStatus: { online: true }
-      };
-    }
-
-    // Format player data into a table
-    let playerData = players.map(player => ({
-      name: player.name,
-      ping: player.ping
-    }));
-
-    return {
-      playerData: playerData,
-      serverStatus: { online: true }
-    };
-  } catch (error) {
-    console.error('Failed to fetch player data:', error);
-    return {
-      playerData: [],
-      serverStatus: { online: false }
-    };
-  }
-}
