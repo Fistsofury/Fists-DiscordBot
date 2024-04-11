@@ -22,12 +22,17 @@ This is a discord bot that displays the amount of players in your server as the 
 - /clearmaintenance: Deletes the maintenance message
 
 ## Config.JSON
--   "token": "your-bot-token-here", -- Put in your bot token
+-  "token": "your-bot-token-here", -- Put in your bot token
 -  "clientId": "your-client-id-here", -- put in your bots application ID
 -  "guildId": "your-guild-id-here", -- Put in your server ID
 -  "serverIp": "your-server-ip-here", -- Can leave blank and use /configure to overwrite
 -  "serverPort": "your-server-port-here", -- Can leave blank and use /configure to overwrite
 -  "allowedRoles": ["your-reole-id-here"] --User permission ID's for people to use the commands ["ROLE_ID_1", "ROLE_ID_2", "ROLE_ID_3"]
+-  "host": "localhost", -- IP or localhost
+-  "port": "3306", -- Port for your database
+-  "user": "root", --username for your database, Root is standard in most Heidi configurations
+-  "password": "", --Password if you have one
+-  "database": "vorpcore_xxxxx" -- your database name exactly how its spelt
 
 ## Prerequisites
 
@@ -56,20 +61,30 @@ Node.js and NPM (Node Package Manager) are essential to run a Discord bot. You c
 
 #### Installing Dependencies
 
-Clone your bot repository and install the necessary node modules:
+You can download the bot and put it anywhere. Once you have found a place for it to live, copy the file directory and the open command prompt and change the directory.
+- cd C:\MyServer\discord-bot\discord-bot then press enter. Run the below commands to install the dependencies.
+
 
 ```bash
-git clone YOUR_REPOSITORY_URL
-cd YOUR_REPOSITORY_DIRECTORY
 npm install
 npm install discord.js
 npm install @discordjs/rest discord-api-types
 npm install axios
 npm install fs-extra
+npm install mysql
 ```
 
-### You will need to run the registerCommands.js before you run the bot.
-```node ./utils/registerCommands.js```
+Once done you will need to register the commands first then run the bot you can do this by following the below commands
+
+```bash
+node ./utils/registerCommands.js
+```
+Then you can now run your bot
+```bash
+node index.js
+```
+
+
 
 ### Special Mentions
 Thanks to Jake2k4, SavSin and Bytesizd
